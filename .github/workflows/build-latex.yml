@@ -1,4 +1,6 @@
-name: Build LaTeX document
+PAPER_NAME: Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction
+
+name: Build paper
 on:
   push:
     branches: [ master ]
@@ -16,9 +18,9 @@ jobs:
       - name: Build
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: "paper/Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.tex"
+          root_file: "paper/${PAPER_NAME}.tex"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: "Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.pdf"
-          path: "paper/Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.pdf"
+          name: "${PAPER_NAME}.pdf"
+          path: "paper/${PAPER_NAME}.pdf"
