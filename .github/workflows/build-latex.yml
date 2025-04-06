@@ -1,13 +1,9 @@
-PAPER_NAME: Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction
-
 name: Build paper
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
-
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
   build:
@@ -18,9 +14,9 @@ jobs:
       - name: Build
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: "paper/${PAPER_NAME}.tex"
+          root_file: "paper/*.tex"
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: "${PAPER_NAME}.pdf"
-          path: "paper/${PAPER_NAME}.pdf"
+          name: PDF
+          path: "paper/*.pdf"
