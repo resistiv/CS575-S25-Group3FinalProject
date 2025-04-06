@@ -1,0 +1,24 @@
+name: Build LaTeX document
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: "paper/Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.tex"
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: "Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.pdf"
+          path: "paper/Childers, Connors, NeSmith - CS 575 Final Paper - Product Construction.pdf"
