@@ -20,6 +20,9 @@ class DFA:
     __slots__ = ("states", "alphabet", "transitions", "start_state", "accepting_states")
 
     def __init__(self, states: list[str], alphabet: list[str], transitions: dict[(str, str), str], start_state: str, accepting_states: list[str]):
+        """
+        Initializes a new instance of the DFA class with all required fields.
+        """
         self.states = states
         self.alphabet = alphabet
         self.transitions = transitions
@@ -34,8 +37,10 @@ class DFA:
     def print_transition_table():
         pass
 
-# KAI
 def read_dfa_file(filename: str) -> DFA:
+    """
+    Reads in a text file representing a DFA and returns a DFA object containing the same data.
+    """
     with open(filename) as file:
         # States as comma-separated line: "q1,q2,q3"
         states = file.readline().split(",")
