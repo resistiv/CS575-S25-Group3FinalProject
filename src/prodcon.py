@@ -36,7 +36,22 @@ class DFA:
 
 # KAI
 def read_dfa_file(filename: str) -> DFA:
-    pass
+    with open(filename) as file:
+        # States as comma-separated line: "q1,q2,q3"
+        states = file.readline().split(",")
+        # Alphabet as comma-separated line: "a,b,c"
+        alphabet = file.readline().split(",")
+        # Transitions are enumerated per-line, in format of: "current_state,input,resulting_state"
+        transitions = {}
+        for _ in range(len(states) * len(alphabet)):
+            trans = file.readline().split(",")
+            transitions[(trans[0], trans[1])] = trans[2]
+        # Start state line: "q1"
+        start_state = file.readline()
+        # Accepting state(s) as comma-separated line: "q2,q3"
+        accepting_states = file.readline().split(",")
+    return DFA(states, alphabet, transitions, start_state, accepting_states)
+        
 
 # AUGGIE
 def save_dfa_file(filename: str, dfa: DFA):
