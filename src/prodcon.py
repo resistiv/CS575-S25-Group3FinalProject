@@ -30,8 +30,28 @@ class DFA:
         self.accepting_states = accepting_states
 
     # EVAN
-    def accepts_string(string: str) -> bool:
-        pass
+    def accepts_string(self, input: str) -> bool:
+        """
+        Takes an input string and returns true if the string is accepted by the DFA, returning false otherwise.
+        """
+        # Initial state is the start state
+        current_state = self.start_state.strip()
+        # Iterate through each character in the input string
+        for char in input:
+            # If the tuple of the current state and the character is in the transitions dict,
+            if (current_state, char) in self.transitions:
+                # Transition to the next state, updating the current_state with the resulting state
+                current_state = self.transitions[(current_state, char)].strip()
+            else:
+                # If the transition DNE, print error message
+                print(f"Invalid transition from {current_state} on input '{char}'")
+                return False
+        print(f"Final State: {current_state}")
+        # If the final state is in the list of accepting states, return True
+        if current_state in self.accepting_states:
+            return True
+        else:
+            return False
 
     # ?
     def print_transition_table():
@@ -50,6 +70,8 @@ def read_dfa_file(filename: str) -> DFA:
         transitions = {}
         for _ in range(len(states) * len(alphabet)):
             trans = file.readline().split(",")
+            if len(trans) != 3: # Added break condition to avoid EOF error -Evan
+                break
             transitions[(trans[0], trans[1])] = trans[2]
         # Start state line: "q1"
         start_state = file.readline()
@@ -68,7 +90,19 @@ def product_construction(dfa1: DFA, dfa2: DFA) -> DFA:
 
 # EVAN
 def main():
-    print("Hello world!")
+    dfa_1 = read_dfa_file("DFA.txt")
+    test_strings = [
+        "000010101",
+        "000010100",
+        "0000101010",
+        "0000101011",
+        "00001010101",
+        "000010101011",
+        "0000101010111",
+        "00001010101111"
+    ]
+    for item in test_strings:
+        print(f"Is '{item}' accepted by DFA? {dfa_1.accepts_string(item)}")
 
 if __name__ == "__main__":
     main()
