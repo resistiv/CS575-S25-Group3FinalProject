@@ -70,7 +70,7 @@ class DFA:
         buffer_length = max_state_length + 10
         #Print the header of the transition table
         print(" " * (buffer_length),"|", "| ".join(f"{char:>5}" for char in self.alphabet))
-        print("-" * (15 + len(self.alphabet) * 7))
+        print("-" * (18 + len(self.alphabet) * 7))
 
         for state in delta:
             # Format state names
@@ -93,7 +93,7 @@ class DFA:
                         print("     ", end=" | ")
             print()
             #Table Footer
-        print("-" * (15 + len(self.alphabet) * 7))
+        print("-" * (18 + len(self.alphabet) * 7))
         
     
     #EVAN
@@ -242,12 +242,13 @@ def main():
     # for item in test_strings:
     #     print(f"Is '{item}' accepted by DFA? {dfa_1.accepts_string(item)}")
     dfa_1 = read_dfa_file("assn3-dfa1.txt")
-    dfa_1.print_transition_table()
+    # dfa_1.print_transition_table()
     dfa_2 = read_dfa_file("assn3-dfa2.txt")
-    dfa_2.print_transition_table()
+    # dfa_2.print_transition_table()
     # dfa_1.visualize_dfa("DFA 1")
     # dfa_2.visualize_dfa("DFA 2")
-    # dfa_f = product_construction(dfa_1, dfa_2)
+    dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+    dfa_f[0].print_transition_table()
 
 if __name__ == "__main__":
     main()
