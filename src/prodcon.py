@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 """
 File: prodcon.py
 Author: Evan Childers, August Connors, and Kai NeSmith
@@ -53,30 +52,93 @@ class DFA:
         else:
             return False
 
-    # ?
-    def print_transition_table():
-        pass
+    # EVAN
+    def print_transition_table(self):
+        """
+        Prints the transition table of the DFA in a readable format.
+        """
+        transition_list = []
+        delta = {}
+        # Iterate through the transitions and add them to a dictionary for easier access
+        for (state, symbol), result_state in self.transitions.items():
+            if (state,symbol) not in delta:
+                if state not in delta:
+                    delta[state] = {}
+                delta[state][symbol] = result_state.strip()
+        # Calculate the max length of the state names for formatting
+        max_state_length = max(len(state) for state in delta.keys())
+        buffer_length = max_state_length + 10
+        #Print the header of the transition table
+        print(" " * (buffer_length),"|", "| ".join(f"{char:>5}" for char in self.alphabet))
+        print("-" * (15 + len(self.alphabet) * 7))
 
+        for state in delta:
+            # Format state names
+            if state in self.start_state and state in self.accepting_states:
+                state = f"->{state}(accept)"
+            elif state in self.start_state:
+                state = f"->{state}"
+            elif state in self.accepting_states:
+                state = f"  {state}(accept)"
+            else:
+                state = f"  {state}  "
+            print(f"{state:<{buffer_length}} |", end="")
+            # for each character in the alphabet, check delta for the an entry of char for the current state and print the resulting state
+            for char in self.alphabet:
+                stripped_state = state.strip("->").split("(")[0].strip()
+                if stripped_state in delta:
+                    if char in delta[stripped_state]:
+                        print(f"{delta[stripped_state][char]:>5}", end=" | ")
+                    else:
+                        print("     ", end=" | ")
+            print()
+            #Table Footer
+        print("-" * (15 + len(self.alphabet) * 7))
+        
+    
+    #EVAN
+    def visualize_dfa(self, filename: str):
+        """
+        Visualizes the DFA using the automathon library. Creates a png file of the DFA in the current directory.
+        """
+        from automathon import DFA  
+        # Library required everything to be a tuple, so convert everything to tuples
+        q = {state.strip() for state in self.states}
+        sigma = {symbol.strip() for symbol in self.alphabet}
+        initial_state = self.start_state.strip()
+        accept_states = {state.strip() for state in self.accepting_states}
+        transition_list = []
+        delta = {}
+        # Iterate through the transitions and add them to a dictionary, pairing each state with a tuple in the form of {symbol1: result_state1, symbol2: result_state2}
+        for (state, symbol), result_state in self.transitions.items():
+            if (state,symbol) not in delta:
+                if state not in delta:
+                    delta[state] = {}
+                delta[state][symbol] = result_state.strip()
+        # Create a new DFA object using the automathon library
+        automata = DFA(q, sigma, delta, initial_state, accept_states)
+        automata.view(f"{filename}")
+        pass
 def read_dfa_file(filename: str) -> DFA:
     """
     Reads in a text file representing a DFA and returns a DFA object containing the same data.
     """
     with open(filename) as file:
         # States as comma-separated line: "q1,q2,q3"
-        states = file.readline().split(",")
+        states = file.readline().strip().split(",")
         # Alphabet as comma-separated line: "a,b,c"
-        alphabet = file.readline().split(",")
+        alphabet = file.readline().strip().split(",")
         # Transitions are enumerated per-line, in format of: "current_state,input,resulting_state"
         transitions = {}
         for _ in range(len(states) * len(alphabet)):
-            trans = file.readline().split(",")
+            trans = file.readline().strip().split(",")
             if len(trans) != 3: # Added break condition to avoid EOF error -Evan
                 break
             transitions[(trans[0], trans[1])] = trans[2]
         # Start state line: "q1"
-        start_state = file.readline()
+        start_state = file.readline().strip()
         # Accepting state(s) as comma-separated line: "q2,q3"
-        accepting_states = file.readline().split(",")
+        accepting_states = file.readline().strip().split(",")
     return DFA(states, alphabet, transitions, start_state, accepting_states)
         
 
@@ -166,19 +228,26 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
 
 # EVAN
 def main():
-    dfa_1 = read_dfa_file("DFA.txt")
-    test_strings = [
-        "000010101",
-        "000010100",
-        "0000101010",
-        "0000101011",
-        "00001010101",
-        "000010101011",
-        "0000101010111",
-        "00001010101111"
-    ]
-    for item in test_strings:
-        print(f"Is '{item}' accepted by DFA? {dfa_1.accepts_string(item)}")
+    # dfa_1 = read_dfa_file("DFA.txt")
+    # test_strings = [
+    #     "000010101",
+    #     "000010100",
+    #     "0000101010",
+    #     "0000101011",
+    #     "00001010101",
+    #     "000010101011",
+    #     "0000101010111",
+    #     "00001010101111"
+    # ]
+    # for item in test_strings:
+    #     print(f"Is '{item}' accepted by DFA? {dfa_1.accepts_string(item)}")
+    dfa_1 = read_dfa_file("assn3-dfa1.txt")
+    dfa_1.print_transition_table()
+    dfa_2 = read_dfa_file("assn3-dfa2.txt")
+    dfa_2.print_transition_table()
+    # dfa_1.visualize_dfa("DFA 1")
+    # dfa_2.visualize_dfa("DFA 2")
+    # dfa_f = product_construction(dfa_1, dfa_2)
 
 if __name__ == "__main__":
     main()
