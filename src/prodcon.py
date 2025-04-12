@@ -143,8 +143,50 @@ def read_dfa_file(filename: str) -> DFA:
         
 
 # AUGGIE
-def save_dfa_file(filename: str, dfa: DFA):
-    pass
+def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
+    with open(filename) as file:
+        first = True
+        for s in dfa.states:
+            if first:
+                file.write(f'{s}')
+                first = False
+            else:
+                file.write(f', {s}')
+        file.write(f'\n')
+
+        first = True
+        for a in dfa.alphabet:
+            if first:
+                file.write(f'{a}')
+                first = False
+            else:
+                file.write(f', {a}')
+        file.write(f'\n')
+
+        for (t_1, a), t_2 in dfa.transitions.items():
+            file.write(f'{t_1},{a},{t_2}\n')
+
+        file.write(f'{dfa.start_state}\n')
+
+        first = True
+        for s in dfa.accepting_states:
+            if first:
+                file.write(f'{s}')
+                first = False
+            else:
+                file.write(f', {s}')
+        file.write(f'\n')
+
+        if len(unreachable_states) > 0:
+            file.write(f'Unreachable States:\n')
+            first = True
+            for s in unreachable_states:
+                if first:
+                    file.write(f'{s}')
+                    first = False
+                else:
+                    file.write(f', {s}')
+            
 
 # AUGGIE
 def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ DFA, list[str] ]:
@@ -223,6 +265,7 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
         if s not in reachable_states:
             unreachable_states.append(s)
 
+    # return product dfa and list of unreachable states
     return (dfa_prod, unreachable_states)
 
 
