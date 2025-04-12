@@ -86,7 +86,71 @@ def save_dfa_file(filename: str, dfa: DFA):
 
 # AUGGIE
 def product_construction(dfa1: DFA, dfa2: DFA) -> DFA:
-    pass
+    '''
+    Constructs a DFA which is the product of dfa1 and dfa2.
+    '''
+
+    # Check if the alphabets of both DFAs are the same
+    # If not, raise an error
+    if set(dfa1.alphabet) != set(dfa2.alphabet):
+        raise ValueError("DFAs must have the same alphabet for product construction.")
+    # If they are the same, set the alphabet to the first DFA's alphabet
+    alphabet = dfa1.alphabet
+
+    # Set the start state of the product DFA to be a string containing the start states of dfa1 and dfa2 separated by a comma
+    start_state = f'{dfa1.start_state},{dfa2.start_state}'
+
+    # Set transitioning to an empty dict
+    transitions = {}
+    # Set states to be a list only containing the start_state of the product
+    states = [start_state]
+    # Call helper function to define transitions dict and states list
+    (transitions, states) = define_transitions(dfa1, dfa2, transitions, states, start_state)
+
+    # TODO: figure out whether accepting states should be defined by intersection, union, or user specified case
+    
+
+    # Create DFA
+    # dfa_prod = DFA(states, alphabet, transitions, start_state, accepting_states)
+
+
+def define_transitions(dfa1: DFA, dfa2: DFA, transitions: dict[(str, str), str], states: list[str], curr_state: str) -> tuple[ dict[(str, str), str], list[str] ]:
+    '''
+    Helper function for product construction.
+    Recursively follows transitions of dfa1 and dfa2 to define the transitions of the product of the two. Also defines the new states to ensure all states defined
+        in product are reachable (cartesian product of dfa1.states and dfa2.states may include state which are unable to be reached)
+    Base case: all transitions from curr_state have been seen before.
+    Recursive element: Call define_transitions for each state accessible by one symbol from curr_state, for which the transition has not already been seen.
+    Returns: A tuple containing:
+              - transitions (dictionary), which contains all transitions from this state and recursively from the states reachable from curr_state.
+              - states (list), which contains all states reachable from curr_state
+    '''
+
+    # iterate through alphabet for all transitions at current state
+    for a in dfa1.alphabet:
+        # check if transition (curr_state, a) already seen, if so, this branch has been explored
+        if (curr_state, a) in transitions.keys():
+            continue    # skip transition on this symbol
+
+        # define the "separation index" as the index of a comma in the current state, which separates state x from dfa1 and state y from dfa2 (curr_state = 'x,y')
+        separation_index = curr_state.index(",")
+
+        # use transitions of dfa1 and dfa2 to find the state a transition from curr_state on symbol a goes to
+        new_state = f'{dfa1.transitions[(curr_state[:separation_index]), a]},{dfa2.transitions[(curr_state[separation_index+1:])]}'
+
+        # add this transition to dict of transitions
+        transitions[(curr_state, a)] = new_state
+
+        # add new state to list of states if has not been seen yet
+        if new_state not in states:
+            states.append(new_state)
+
+        # define the transitions and states from new_state
+        (transitions, states) = define_transitions(dfa1, dfa2, transitions, states, new_state)
+
+    # return the transitions and states reachable from curr_state
+    return (transitions, states)
+
 
 # EVAN
 def main():
