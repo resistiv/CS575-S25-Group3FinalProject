@@ -85,71 +85,83 @@ def save_dfa_file(filename: str, dfa: DFA):
     pass
 
 # AUGGIE
-def product_construction(dfa1: DFA, dfa2: DFA) -> DFA:
+def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ DFA, list[str] ]:
     '''
     Constructs a DFA which is the product of dfa1 and dfa2.
+    Parameters:
+        - dfa1, dfa2: the two DFA's to be used in the product construction
+        - is_intersection: flag for whether the product DFA will be an intersection (=True) or union (=False)
+    Returns: tuple including
+        - The product DFA
+        - A list of states which are unreachable
     '''
 
     # Check if the alphabets of both DFAs are the same
     # If not, raise an error
     if set(dfa1.alphabet) != set(dfa2.alphabet):
         raise ValueError("DFAs must have the same alphabet for product construction.")
-    # If they are the same, set the alphabet to the first DFA's alphabet
+    
+    # Set the alphabet to the first DFA's alphabet (arbitrary choice)
     alphabet = dfa1.alphabet
 
     # Set the start state of the product DFA to be a string containing the start states of dfa1 and dfa2 separated by a comma
     start_state = f'{dfa1.start_state},{dfa2.start_state}'
 
-    # Set transitioning to an empty dict
+    # Initialize empty lists for states and accepting states and an empty dict for transitions
+    states = []
+    accepting_states = []
     transitions = {}
-    # Set states to be a list only containing the start_state of the product
-    states = [start_state]
-    # Call helper function to define transitions dict and states list
-    (transitions, states) = define_transitions(dfa1, dfa2, transitions, states, start_state)
-
-    # TODO: figure out whether accepting states should be defined by intersection, union, or user specified case
-    
-
-    # Create DFA
-    # dfa_prod = DFA(states, alphabet, transitions, start_state, accepting_states)
-
-
-def define_transitions(dfa1: DFA, dfa2: DFA, transitions: dict[(str, str), str], states: list[str], curr_state: str) -> tuple[ dict[(str, str), str], list[str] ]:
-    '''
-    Helper function for product construction.
-    Recursively follows transitions of dfa1 and dfa2 to define the transitions of the product of the two. Also defines the new states to ensure all states defined
-        in product are reachable (cartesian product of dfa1.states and dfa2.states may include state which are unable to be reached)
-    Base case: all transitions from curr_state have been seen before.
-    Recursive element: Call define_transitions for each state accessible by one symbol from curr_state, for which the transition has not already been seen.
-    Returns: A tuple containing:
-              - transitions (dictionary), which contains all transitions from this state and recursively from the states reachable from curr_state.
-              - states (list), which contains all states reachable from curr_state
-    '''
-
-    # iterate through alphabet for all transitions at current state
-    for a in dfa1.alphabet:
-        # check if transition (curr_state, a) already seen, if so, this branch has been explored
-        if (curr_state, a) in transitions.keys():
-            continue    # skip transition on this symbol
-
-        # define the "separation index" as the index of a comma in the current state, which separates state x from dfa1 and state y from dfa2 (curr_state = 'x,y')
-        separation_index = curr_state.index(",")
-
-        # use transitions of dfa1 and dfa2 to find the state a transition from curr_state on symbol a goes to
-        new_state = f'{dfa1.transitions[(curr_state[:separation_index]), a]},{dfa2.transitions[(curr_state[separation_index+1:])]}'
-
-        # add this transition to dict of transitions
-        transitions[(curr_state, a)] = new_state
-
-        # add new state to list of states if has not been seen yet
-        if new_state not in states:
+    # iterate through the states of each dfa and the symbols of the alphabet
+    for s_1 in dfa1.states:         # iterate through all states of dfa1
+        for s_2 in dfa2.states:     # iterate through all states of dfa2
+            # create and append new state to represent the combination of s_1 and s_2
+            new_state = f'{s_1},{s_2}'
             states.append(new_state)
 
-        # define the transitions and states from new_state
-        (transitions, states) = define_transitions(dfa1, dfa2, transitions, states, new_state)
+            # check if new_state is an accepting state based on whether the product is a union or intersection
+            if is_intersection and s_1 in dfa1.accepting_states and s_2 in dfa2.accepting_states:
+                accepting_states.append(new_state)
+            elif not is_intersection and (s_1 in dfa1.accepting_states or s_2 in dfa2.accepting_states):
+                accepting_states.append(new_state)
 
-    # return the transitions and states reachable from curr_state
-    return (transitions, states)
+            # iterate through symbols in the alphabet to define new_state's transitions
+            for a in alphabet:
+                # create state comprised of the states which are transitions on a from s_1 and s_2 
+                trans_state = f'{dfa1.transitions[(s_1, a)]},{dfa2.transitions[(s_2, a)]}'
+                # add transition to the dictionary
+                transitions[(new_state, a)] = trans_state
+
+    # Create DFA
+    dfa_prod = DFA(states, alphabet, transitions, start_state, accepting_states)
+
+
+    # create two empty lists to represent the reachable states in the product DFA and a queue
+    reachable_states = []
+    queue = []
+
+    # append start_state to reachable_states and queue
+    reachable_states.append(start_state)
+    queue.append(start_state)
+    # Use a BFS to find all states reachable from start_state
+    while len(queue) > 0:   # while queue contains states
+        # pop the first state in the queue
+        curr_state = queue.pop(0)
+        for a in alphabet:  # iterate through symbols in the alphabet
+            # find the state which is the transition on a from curr_state
+            trans_state = transitions[(curr_state, a)]
+            # if trans_state has not been seen yet, add to reachable_states and queue
+            if trans_state not in reachable_states:
+                reachable_states.append(trans_state)
+                queue.append(trans_state)
+    
+    # create list for unreachable states
+    unreachable_states = []
+    for s in states:    # iterate through all states in dfa_prod
+        # if s is not reachable, append it to unreachable_states
+        if s not in reachable_states:
+            unreachable_states.append(s)
+
+    return (dfa_prod, unreachable_states)
 
 
 # EVAN
