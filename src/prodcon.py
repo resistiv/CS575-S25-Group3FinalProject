@@ -152,7 +152,7 @@ def read_dfa_file(filename: str) -> DFA:
     return DFA(states, alphabet, transitions, start_state, accepting_states)
 
 def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
-    with open(filename, 'x') as file: # Change mode to 'x' in order to create and write to file -Kai
+    with open(filename, 'w') as file: # Change mode to 'x' in order to create and write to file -Kai
         first = True
         for s in dfa.states:
             if first:
