@@ -46,7 +46,7 @@ class DFA:
                 # If the transition DNE, print error message
                 print(f"Invalid transition from {current_state} on input '{char}'")
                 return False
-        print(f"Final State: {current_state}")
+        # print(f"Final State: {current_state}")
         # If the final state is in the list of accepting states, return True
         if current_state in self.accepting_states:
             return True
@@ -287,32 +287,45 @@ def find_unreachable_states(dfa: DFA) -> list[str]:
     return unreachable_states
 
 def main():
-    # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
-    if len(sys.argv) != 4:
-        print(sys.argv)
-        print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
-        return
+    # # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
+    # if len(sys.argv) != 4:
+    #     print(sys.argv)
+    #     print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
+    #     return
     
-    # Read and process DFAs
-    dfa1 = read_dfa_file(sys.argv[1])
-    dfa2 = read_dfa_file(sys.argv[2])
-    dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
+    # # Read and process DFAs
+    # dfa1 = read_dfa_file(sys.argv[1])
+    # dfa2 = read_dfa_file(sys.argv[2])
+    # dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
 
-    # Output
-    dfa1.print_transition_table()
-    dfa2.print_transition_table()
-    dfaf.print_transition_table()
-    save_dfa_file(sys.argv[3], dfaf, unreachable_states)
-    print("Unreachable states: ", unreachable_states)
-    dfa1.visualize_dfa("DFA-1")
-    dfa2.visualize_dfa("DFA-2")
-    dfaf.visualize_dfa("DFA-Final")
+    # # Output
+    # dfa1.print_transition_table()
+    # dfa2.print_transition_table()
+    # dfaf.print_transition_table()
+    # save_dfa_file(sys.argv[3], dfaf, unreachable_states)
+    # print("Unreachable states: ", unreachable_states)
+    # dfa1.visualize_dfa("DFA-1")
+    # dfa2.visualize_dfa("DFA-2")
+    # dfaf.visualize_dfa("DFA-Final")
 
 
         # Example 1:
-    # dfa_1 = read_dfa_file("./tests/assn3-dfa1.txt")
-    # dfa_2 = read_dfa_file("./tests/assn3-dfa2.txt")
-    # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+    dfa_1 = read_dfa_file("./tests/example3-dfa1.txt")
+    dfa_2 = read_dfa_file("./tests/example3-dfa2.txt")
+    dfa_u = product_construction(dfa_1, dfa_2, is_intersection=False)
+    dfa_i = product_construction(dfa_1, dfa_2, is_intersection=True)
+    
+    test_strings =["10011", "10010"]
+
+    for string in test_strings:
+        print()
+        print(f"Does DFA 1 accept {string}?: {dfa_1.accepts_string(string)}")
+        print(f"Does DFA 2 accept {string}?: {dfa_2.accepts_string(string)}")
+        print(f"Does the union of the DFAs accept {string}?: {dfa_u[0].accepts_string(string)}")
+        print(f"Does the intersection of the DFA accept {string}?: {dfa_i[0].accepts_string(string)}")
+        print()
+
+
     # dfa_1.visualize_dfa("DFA 1")
     # dfa_1.print_transition_table()
     # dfa_2.visualize_dfa("DFA 2")
@@ -327,7 +340,7 @@ def main():
     # dfa_2 = read_dfa_file("./tests/example3-dfa2.txt")
     # dfa_2.print_transition_table()
     # dfa_2.visualize_dfa("DFA 2")
-    # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+    # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=False)
     # dfa_f[0].print_transition_table()
     # dfa_f[0].visualize_dfa("DFA Product")
 
