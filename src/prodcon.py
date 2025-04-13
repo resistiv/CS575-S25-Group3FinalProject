@@ -11,6 +11,8 @@ __credits__ = ["Evan Childers", "August Connors", "Kai NeSmith"]
 __license__ = "MIT"
 __version__ = "1.0.0"
 
+import sys
+
 class DFA:
     """
     Represents a deterministic finite automaton.
@@ -28,7 +30,6 @@ class DFA:
         self.start_state = start_state
         self.accepting_states = accepting_states
 
-    # EVAN
     def accepts_string(self, input: str) -> bool:
         """
         Takes an input string and returns true if the string is accepted by the DFA, returning false otherwise.
@@ -52,7 +53,6 @@ class DFA:
         else:
             return False
 
-    # EVAN
     def print_transition_table(self):
         """
         Prints the transition table of the DFA in a readable format.
@@ -95,8 +95,6 @@ class DFA:
             #Table Footer
         print("-" * (18 + len(self.alphabet) * 7))
         
-    
-    #EVAN
     def visualize_dfa(self, filename: str):
         """
         Visualizes the DFA using the automathon library. Creates a png file of the DFA in the current directory.
@@ -119,6 +117,7 @@ class DFA:
         automata = DFA(q, sigma, delta, initial_state, accept_states)
         automata.view(f"{filename}")
         pass
+
 def read_dfa_file(filename: str) -> DFA:
     """
     Reads in a text file representing a DFA and returns a DFA object containing the same data.
@@ -144,11 +143,9 @@ def read_dfa_file(filename: str) -> DFA:
             accepting_states = []
             
     return DFA(states, alphabet, transitions, start_state, accepting_states)
-        
 
-# AUGGIE
 def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
-    with open(filename) as file:
+    with open(filename, 'x') as file: # Change mode to 'x' in order to create and write to file -Kai
         first = True
         for s in dfa.states:
             if first:
@@ -190,9 +187,7 @@ def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
                     first = False
                 else:
                     file.write(f', {s}')
-            
 
-# AUGGIE
 def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ DFA, list[str] ]:
     '''
     Constructs a DFA which is the product of dfa1 and dfa2.
@@ -272,9 +267,30 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
     # return product dfa and list of unreachable states
     return (dfa_prod, unreachable_states)
 
-
-# EVAN
 def main():
+    # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
+    if len(sys.argv) != 4:
+        print(sys.argv)
+        print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
+        return
+    
+    # Read and process DFAs
+    dfa1 = read_dfa_file(sys.argv[1])
+    dfa2 = read_dfa_file(sys.argv[2])
+    dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
+
+    # Output
+    dfa1.print_transition_table()
+    dfa2.print_transition_table()
+    dfaf.print_transition_table()
+    save_dfa_file(sys.argv[3], dfaf, unreachable_states)
+    print("Unreachable states: ", unreachable_states)
+    dfa1.visualize_dfa("DFA-1")
+    dfa2.visualize_dfa("DFA-2")
+    dfaf.visualize_dfa("DFA-Final")
+
+    return
+
     # Example 1:
     # dfa_1 = read_dfa_file("./tests/assn3-dfa1.txt")
     # dfa_2 = read_dfa_file("./tests/assn3-dfa2.txt")
