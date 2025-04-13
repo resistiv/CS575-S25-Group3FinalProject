@@ -276,25 +276,25 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
 
 def main():
     # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
-    # if len(sys.argv) != 4:
-    #     print(sys.argv)
-    #     print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
-    #     return
+    if len(sys.argv) != 4:
+        print(sys.argv)
+        print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
+        return
     
-    # # Read and process DFAs
-    # dfa1 = read_dfa_file(sys.argv[1])
-    # dfa2 = read_dfa_file(sys.argv[2])
-    # dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
+    # Read and process DFAs
+    dfa1 = read_dfa_file(sys.argv[1])
+    dfa2 = read_dfa_file(sys.argv[2])
+    dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
 
-    # # Output
-    # dfa1.print_transition_table()
-    # dfa2.print_transition_table()
-    # dfaf.print_transition_table()
-    # save_dfa_file(sys.argv[3], dfaf, unreachable_states)
-    # print("Unreachable states: ", unreachable_states)
-    # dfa1.visualize_dfa("DFA-1")
-    # dfa2.visualize_dfa("DFA-2")
-    # dfaf.visualize_dfa("DFA-Final")
+    # Output
+    dfa1.print_transition_table()
+    dfa2.print_transition_table()
+    dfaf.print_transition_table()
+    save_dfa_file(sys.argv[3], dfaf, unreachable_states)
+    print("Unreachable states: ", unreachable_states)
+    dfa1.visualize_dfa("DFA-1")
+    dfa2.visualize_dfa("DFA-2")
+    dfaf.visualize_dfa("DFA-Final")
 
 
         # Example 1:
@@ -309,15 +309,15 @@ def main():
     # dfa_f[0].print_transition_table()
 
     # Example 2:
-    dfa_1 = read_dfa_file("./tests/example3dfa1.txt")
+    # dfa_1 = read_dfa_file("./tests/example3-dfa1.txt")
     # dfa_1.print_transition_table()
     # dfa_1.visualize_dfa("DFA 1")
-    dfa_2 = read_dfa_file("./tests/example3dfa2.txt")
+    # dfa_2 = read_dfa_file("./tests/example3-dfa2.txt")
     # dfa_2.print_transition_table()
     # dfa_2.visualize_dfa("DFA 2")
-    dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
-    dfa_f[0].print_transition_table()
-    dfa_f[0].visualize_dfa("DFA Product")
+    # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+    # dfa_f[0].print_transition_table()
+    # dfa_f[0].visualize_dfa("DFA Product")
 
     return
 
