@@ -11,6 +11,8 @@ __credits__ = ["Evan Childers", "August Connors", "Kai NeSmith"]
 __license__ = "MIT"
 __version__ = "1.0.0"
 
+import sys
+
 class DFA:
     """
     Represents a deterministic finite automaton.
@@ -28,7 +30,6 @@ class DFA:
         self.start_state = start_state
         self.accepting_states = accepting_states
 
-    # EVAN
     def accepts_string(self, input: str) -> bool:
         """
         Takes an input string and returns true if the string is accepted by the DFA, returning false otherwise.
@@ -52,14 +53,13 @@ class DFA:
         else:
             return False
 
-    # EVAN
     def print_transition_table(self):
         """
         Prints the transition table of the DFA in a readable format.
         """
         transition_list = []
         delta = {}
-        # Iterate through the transitions and add them to a dictionary for easier access
+        # Iterate through the transitions and add them to a dictionary, pairing each state with a tuple in the form of {symbol1: result_state1, symbol2: result_state2}
         for (state, symbol), result_state in self.transitions.items():
             if (state,symbol) not in delta:
                 if state not in delta:
@@ -67,19 +67,25 @@ class DFA:
                 delta[state][symbol] = result_state.strip()
         # Calculate the max length of the state names for formatting
         max_state_length = max(len(state) for state in delta.keys())
+        #Calculate buffer length by adding 10 to provide space for left column of the table
         buffer_length = max_state_length + 10
-        #Print the header of the transition table
-        print(" " * (buffer_length),"|", "| ".join(f"{char:>5}" for char in self.alphabet))
-        print("-" * (18 + len(self.alphabet) * 7))
+        #Print the header with space for alphabet in the header
+        print(" " * (buffer_length),"|", " | ".join(f"{char:>{max_state_length}}" for char in self.alphabet))
+        # Print header separator
+        print("-" * (18 + len(self.alphabet) * max_state_length + 7))
 
         for state in delta:
             # Format state names
+            #If the state is an accepting state and a start state
             if state in self.start_state and state in self.accepting_states:
                 state = f"->{state}(accept)"
+            #If the state is only a start state
             elif state in self.start_state:
                 state = f"->{state}"
+            #If the state is only an accepting state
             elif state in self.accepting_states:
                 state = f"  {state}(accept)"
+            # If the state is neither a start nor an accepting state
             else:
                 state = f"  {state}  "
             print(f"{state:<{buffer_length}} |", end="")
@@ -88,15 +94,14 @@ class DFA:
                 stripped_state = state.strip("->").split("(")[0].strip()
                 if stripped_state in delta:
                     if char in delta[stripped_state]:
-                        print(f"{delta[stripped_state][char]:>5}", end=" | ")
+                        print(f" {delta[stripped_state][char]:>{max_state_length}}", end=" | ")
                     else:
+                        #If the state does not have a valid transition for the character, print a blank space in the transition table
                         print("     ", end=" | ")
             print()
-            #Table Footer
-        print("-" * (18 + len(self.alphabet) * 7))
+            #Print the table footer
+        print("-" * (18 + len(self.alphabet) * max_state_length + 7))
         
-    
-    #EVAN
     def visualize_dfa(self, filename: str):
         """
         Visualizes the DFA using the automathon library. Creates a png file of the DFA in the current directory.
@@ -119,6 +124,7 @@ class DFA:
         automata = DFA(q, sigma, delta, initial_state, accept_states)
         automata.view(f"{filename}")
         pass
+
 def read_dfa_file(filename: str) -> DFA:
     """
     Reads in a text file representing a DFA and returns a DFA object containing the same data.
@@ -144,11 +150,9 @@ def read_dfa_file(filename: str) -> DFA:
             accepting_states = []
             
     return DFA(states, alphabet, transitions, start_state, accepting_states)
-        
 
-# AUGGIE
 def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
-    with open(filename) as file:
+    with open(filename, 'x') as file: # Change mode to 'x' in order to create and write to file -Kai
         first = True
         for s in dfa.states:
             if first:
@@ -190,9 +194,7 @@ def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
                     first = False
                 else:
                     file.write(f', {s}')
-            
 
-# AUGGIE
 def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ DFA, list[str] ]:
     '''
     Constructs a DFA which is the product of dfa1 and dfa2.
@@ -272,10 +274,30 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
     # return product dfa and list of unreachable states
     return (dfa_prod, unreachable_states)
 
-
-# EVAN
 def main():
-    # Example 1:
+    # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
+    # if len(sys.argv) != 4:
+    #     print(sys.argv)
+    #     print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
+    #     return
+    
+    # # Read and process DFAs
+    # dfa1 = read_dfa_file(sys.argv[1])
+    # dfa2 = read_dfa_file(sys.argv[2])
+    # dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
+
+    # # Output
+    # dfa1.print_transition_table()
+    # dfa2.print_transition_table()
+    # dfaf.print_transition_table()
+    # save_dfa_file(sys.argv[3], dfaf, unreachable_states)
+    # print("Unreachable states: ", unreachable_states)
+    # dfa1.visualize_dfa("DFA-1")
+    # dfa2.visualize_dfa("DFA-2")
+    # dfaf.visualize_dfa("DFA-Final")
+
+
+        # Example 1:
     # dfa_1 = read_dfa_file("./tests/assn3-dfa1.txt")
     # dfa_2 = read_dfa_file("./tests/assn3-dfa2.txt")
     # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
@@ -296,6 +318,10 @@ def main():
     dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
     dfa_f[0].print_transition_table()
     dfa_f[0].visualize_dfa("DFA Product")
+
+    return
+
+
 
 if __name__ == "__main__":
     main()
