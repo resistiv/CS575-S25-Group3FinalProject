@@ -1,0 +1,9 @@
+digraph "DFA 1" {
+	graph [rankdir=LR]
+	"" [label="" shape=plaintext]
+	"" [label="" shape=doublecircle]
+	q0 [label=q0 shape=circle]
+	"" -> q0 [label=""]
+	q0 -> q0 [label=0]
+	q0 -> q0 [label=1]
+}

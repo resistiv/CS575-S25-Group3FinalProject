@@ -271,21 +271,21 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
 
 # EVAN
 def main():
-    dfa_1 = read_dfa_file("assn3-dfa1.txt")
-    # dfa_1.print_transition_table()
-    dfa_2 = read_dfa_file("assn3-dfa2.txt")
-    # dfa_2.print_transition_table()
+    # Example 1:
+    # dfa_1 = read_dfa_file("./tests/assn3-dfa1.txt")
+    # dfa_2 = read_dfa_file("./tests/assn3-dfa2.txt")
+    # dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
     # dfa_1.visualize_dfa("DFA 1")
+    # dfa_1.print_transition_table()
     # dfa_2.visualize_dfa("DFA 2")
-    dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+    # dfa_2.print_transition_table()
+    # dfa_f[0].visualize_dfa("DFA Product")
+    # dfa_f[0].print_transition_table()
 
-
-    dfa_1.visualize_dfa("DFA 1")
+    # Example 2:
+    dfa_1 = read_dfa_file("./tests/example3dfa1.txt")
     dfa_1.print_transition_table()
-    dfa_2.visualize_dfa("DFA 2")
-    dfa_2.print_transition_table()
-    dfa_f[0].visualize_dfa("DFA Product")
-    dfa_f[0].print_transition_table()
+    dfa_1.visualize_dfa("DFA 1")
 
 
 if __name__ == "__main__":
