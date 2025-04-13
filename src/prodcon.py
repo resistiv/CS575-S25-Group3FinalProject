@@ -237,21 +237,34 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
     # Create DFA
     dfa_prod = DFA(states, alphabet, transitions, start_state, accepting_states)
 
+    unreachable_states = find_unreachable_states(dfa_prod)
 
+    # return product dfa and list of unreachable states
+    return (dfa_prod, unreachable_states)
+
+def find_unreachable_states(dfa: DFA) -> list[str]:
+    '''
+    Helper function for product_construction().
+    Uses a BFS to find the unreachable states (if there are any) of the given DFA.
+    Parameters:
+        - dfa: the DFA to be checked for unreachable states
+    Returns:
+        - list of unreachable states (could be empty)
+    '''
     # create two empty lists to represent the reachable states in the product DFA and a queue
     reachable_states = []
     queue = []
 
     # append start_state to reachable_states and queue
-    reachable_states.append(start_state)
-    queue.append(start_state)
+    reachable_states.append(dfa.start_state)
+    queue.append(dfa.start_state)
     # Use a BFS to find all states reachable from start_state
     while len(queue) > 0:   # while queue contains states
         # pop the first state in the queue
         curr_state = queue.pop(0)
-        for a in alphabet:  # iterate through symbols in the alphabet
+        for a in dfa.alphabet:  # iterate through symbols in the alphabet
             # find the state which is the transition on a from curr_state
-            trans_state = transitions[(curr_state, a)]
+            trans_state = dfa.transitions[(curr_state, a)]
             # if trans_state has not been seen yet, add to reachable_states and queue
             if trans_state not in reachable_states:
                 reachable_states.append(trans_state)
@@ -259,13 +272,12 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
     
     # create list for unreachable states
     unreachable_states = []
-    for s in states:    # iterate through all states in dfa_prod
+    for s in dfa.states:    # iterate through all states in dfa_prod
         # if s is not reachable, append it to unreachable_states
         if s not in reachable_states:
             unreachable_states.append(s)
-
-    # return product dfa and list of unreachable states
-    return (dfa_prod, unreachable_states)
+        
+    return unreachable_states
 
 def main():
     # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
