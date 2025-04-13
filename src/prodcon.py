@@ -228,19 +228,6 @@ def product_construction(dfa1: DFA, dfa2: DFA, is_intersection: bool) -> tuple[ 
 
 # EVAN
 def main():
-    # dfa_1 = read_dfa_file("DFA.txt")
-    # test_strings = [
-    #     "000010101",
-    #     "000010100",
-    #     "0000101010",
-    #     "0000101011",
-    #     "00001010101",
-    #     "000010101011",
-    #     "0000101010111",
-    #     "00001010101111"
-    # ]
-    # for item in test_strings:
-    #     print(f"Is '{item}' accepted by DFA? {dfa_1.accepts_string(item)}")
     dfa_1 = read_dfa_file("assn3-dfa1.txt")
     # dfa_1.print_transition_table()
     dfa_2 = read_dfa_file("assn3-dfa2.txt")
@@ -248,7 +235,15 @@ def main():
     # dfa_1.visualize_dfa("DFA 1")
     # dfa_2.visualize_dfa("DFA 2")
     dfa_f = product_construction(dfa_1, dfa_2, is_intersection=True)
+
+
+    dfa_1.visualize_dfa("DFA 1")
+    dfa_1.print_transition_table()
+    dfa_2.visualize_dfa("DFA 2")
+    dfa_2.print_transition_table()
+    dfa_f[0].visualize_dfa("DFA Product")
     dfa_f[0].print_transition_table()
+
 
 if __name__ == "__main__":
     main()
