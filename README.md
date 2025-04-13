@@ -34,3 +34,7 @@ python prodcon.py <path of input DFA file #1> <path of input DFA file #2> <path 
 ```
 
 Argument indices are assumed to be including ``prodcon.py``; if you run the program via ``./prodcon.py ...`` instead of ``python prodcon.py ...``, you will not get the desired outcome.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
