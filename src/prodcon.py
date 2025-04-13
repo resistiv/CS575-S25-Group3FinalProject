@@ -139,6 +139,10 @@ def read_dfa_file(filename: str) -> DFA:
         start_state = file.readline().strip()
         # Accepting state(s) as comma-separated line: "q2,q3"
         accepting_states = file.readline().strip().split(",")
+        # Test for edge case where no accepting states are provided, but states are populated with a blank string
+        if len(accepting_states) == 1 and not accepting_states[0]:
+            accepting_states = []
+            
     return DFA(states, alphabet, transitions, start_state, accepting_states)
         
 
