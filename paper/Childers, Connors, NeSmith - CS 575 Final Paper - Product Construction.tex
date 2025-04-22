@@ -54,6 +54,93 @@ While the process of DFA product construction is a well understood concept in au
 \textbf{IMPLEMENTATION DETAILS HERE - AUGIE}
 
 \section{Experiments}
+In this section, we will explore how product construction can be applied to a variety of different DFA's with a focus on the differences between intersection and union as well as identifying the causes of unreachable states in the resulting automaton
+\subsection{Experiment 1}
+In this experiment, we will be computing the product construction of the following DFA's using the intersection operations:
+
+\begin{table}[h!]
+\centering
+\caption{DFA 1 Transition Table}
+\begin{tabular}{|c|c|c|}
+\hline
+ & 0 & 1 \\
+\hline
+$\rightarrow$a\textsubscript{0} & a\textsubscript{1} & a\textsubscript{1} \\
+\hline
+a\textsubscript{1} & a\textsubscript{r} & a\textsubscript{2} \\
+\hline
+a\textsubscript{2}(accept) & a\textsubscript{2} & a\textsubscript{2} \\
+\hline
+a\textsubscript{r} & a\textsubscript{r} & a\textsubscript{r} \\
+\hline
+\end{tabular}
+\label{table:dfa1}
+\end{table}
+\begin{table}[h!]
+\centering
+\caption{DFA 2 Transition Table}
+\begin{tabular}{|c|c|c|}
+\hline
+ & 0 & 1 \\
+\hline
+$\rightarrow$b\textsubscript{0} & b\textsubscript{1} & b\textsubscript{0} \\
+\hline
+b\textsubscript{1}(accept) & b\textsubscript{1} & b\textsubscript{1} \\
+\hline
+\end{tabular}
+\label{table:dfa1}
+\end{table}
+When computing the product of these two DFA's, the resulting transition table is:
+\begin{table}[h]
+\caption{Product DFA Transition Table}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+ & 0 & 1 \\
+\hline
+$\rightarrow$a\textsubscript{0},b\textsubscript{0} & a\textsubscript{1},b\textsubscript{1} & a\textsubscript{1},b\textsubscript{0} \\
+\hline
+a\textsubscript{0},b\textsubscript{1} & a\textsubscript{1},b\textsubscript{1} & a\textsubscript{1},b\textsubscript{1} \\
+\hline
+a\textsubscript{1},b\textsubscript{0} & a\textsubscript{r},b\textsubscript{1} & a\textsubscript{2},b\textsubscript{0} \\
+\hline
+a\textsubscript{1},b\textsubscript{1} & a\textsubscript{r},b\textsubscript{1} & a\textsubscript{2},b\textsubscript{1} \\
+\hline
+a\textsubscript{2},b\textsubscript{0} & a\textsubscript{2},b\textsubscript{1} & a\textsubscript{2},b\textsubscript{0} \\
+\hline
+a\textsubscript{2},b\textsubscript{1}(accept) & a\textsubscript{2},b\textsubscript{1} & a\textsubscript{2},b\textsubscript{1} \\
+\hline
+a\textsubscript{r},b\textsubscript{0} & a\textsubscript{r},b\textsubscript{1} & a\textsubscript{r},b\textsubscript{0} \\
+\hline
+a\textsubscript{r},b\textsubscript{1} & a\textsubscript{r},b\textsubscript{1} & a\textsubscript{r},b\textsubscript{1} \\
+\hline
+\end{tabular}
+\label{table:dfa1}
+\end{table} \\
+With the algorithmically determined unreachable states being $a_0,b_1$ and $a_r,b_0$.\\ (DETAIL WHY THESE ARE UNREACHABLE HERE)
+
+In order to verify the intersection and union properties, we use the \texttt{accepts\_string} method to test string acceptance in the product DFA. The results demonstrate the logical operations between the original DFAs:
+
+\begin{table}[h!]
+\centering
+\caption{Boolean Analysis of Product DFA Operations}
+\label{table:dfa_boolean}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{DFA Type} & \textbf{11} & \textbf{00} & \textbf{01} & \textbf{1} \\ \hline
+DFA 1 & True & False & True & False \\ \hline
+DFA 2 & False & True & True & False \\ \hline
+Union DFA & True & True & True & False \\ \hline
+Intersection DFA & False & False & True & False \\ \hline
+\end{tabular}
+\end{table} 
+
+As shown in table, the union DFA accepts a string if either original DFA accepts it ($\text{DFA}_1 \cup \text{DFA}_2$), while the intersection DFA only accepts strings accepted by both ($\text{DFA}_1 \cap \text{DFA}_2$). The results confirm the correct implementation of these Boolean operations.
+
+
+\subsection{Experiment 2}
+
+
 \textbf{EXPERIMENTS HERE - EVAN \& KAI}
 
 \section{Contributions}
