@@ -159,7 +159,7 @@ def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
                 file.write(f'{s}')
                 first = False
             else:
-                file.write(f', {s}')
+                file.write(f',{s}')
         file.write(f'\n')
 
         first = True
@@ -168,7 +168,7 @@ def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
                 file.write(f'{a}')
                 first = False
             else:
-                file.write(f', {a}')
+                file.write(f',{a}')
         file.write(f'\n')
 
         for (t_1, a), t_2 in dfa.transitions.items():
