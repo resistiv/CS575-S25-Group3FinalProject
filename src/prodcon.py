@@ -131,28 +131,42 @@ def read_dfa_file(filename: str) -> DFA:
     """
     with open(filename) as file:
         # States as comma-separated line: "q1,q2,q3"
-        states = file.readline().strip().split(",")
-        # Alphabet as comma-separated line: "a,b,c"
-        alphabet = file.readline().strip().split(",")
+        states = list(filter(None, file.readline().strip().split(",")))
+        if len(states) == 0:
+            raise Exception("A DFA must contain at least one state.")
+        # Alphabet as comma-separated line: "a,b,c" (can technically be empty)
+        alphabet = list(filter(None, file.readline().strip().split(",")))
+
+        # Initialize keys in dictionary to validate input
+        transitions = {(q, a): None for q in states for a in alphabet}
         # Transitions are enumerated per-line, in format of: "current_state,input,resulting_state"
-        transitions = {}
         for _ in range(len(states) * len(alphabet)):
-            trans = file.readline().strip().split(",")
-            if len(trans) != 3: # Added break condition to avoid EOF error -Evan
-                break
+            trans = list(filter(None, file.readline().strip().split(",")))
+            if len(trans) != 3:
+                raise Exception(f"Improperly formatted transition: {trans}")
+            if trans[0] not in states:
+                raise Exception(f"Attempted to define transition whose source state does not exist in the DFA: {trans}")
+            if trans[2] not in states:
+                raise Exception(f"Attempted to define transition whose destination state does not exist in the DFA: {trans}")
+            if trans[1] not in alphabet:
+                raise Exception(f"Attempted to define transition whose input does not exist in the DFA's alphabet: {trans}")
             transitions[(trans[0], trans[1])] = trans[2]
+        # Check that all transitions are defined (could have double-defined a transition)
+        for src_input_pair, dest in transitions.items():
+            if dest is None:
+                raise Exception(f"Undefined transition on {src_input_pair}.")
+
         # Start state line: "q1"
         start_state = file.readline().strip()
+        if not start_state:
+            raise Exception("No start state is defined for the DFA.")
         # Accepting state(s) as comma-separated line: "q2,q3"
-        accepting_states = file.readline().strip().split(",")
-        # Test for edge case where no accepting states are provided, but states are populated with a blank string
-        if len(accepting_states) == 1 and not accepting_states[0]:
-            accepting_states = []
+        accepting_states = list(filter(None, file.readline().strip().split(",")))
             
     return DFA(states, alphabet, transitions, start_state, accepting_states)
 
 def save_dfa_file(filename: str, dfa: DFA, unreachable_states: list[str]):
-    with open(filename, 'w') as file: # Change mode to 'x' in order to create and write to file -Kai
+    with open(filename, 'w') as file: # Change mode to 'w' in order to create and write to file -Kai
         first = True
         for s in dfa.states:
             if first:
@@ -287,43 +301,63 @@ def find_unreachable_states(dfa: DFA) -> list[str]:
     return unreachable_states
 
 def main():
-    # # Args check (expecting: "prodcon.py", "input1", "input2", "output path")
-    # if len(sys.argv) != 4:
-    #     print(sys.argv)
-    #     print("Usage: python prodcon.py <DFA file 1> <DFA file 2> <DFA file output>")
-    #     return
+    # Make a good first impression
+    print("ProdCon: A Python DFA product construction program\nChilders, Connors, NeSmith (C) 2025")
+
+    # Args check (expecting: "prodcon.py", "i" or "u", "input1", "input2", "output path")
+    if len(sys.argv) != 5:
+        print(sys.argv)
+        print("Usage: python prodcon.py <\"i\" | \"u\"> <DFA file 1> <DFA file 2> <DFA file output>")
+        return
     
-    # # Read and process DFAs
-    # dfa1 = read_dfa_file(sys.argv[1])
-    # dfa2 = read_dfa_file(sys.argv[2])
-    # dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=True)
+    # Read and process DFAs
+    mode = sys.argv[1].lower()
+    if mode == "i":
+        intersection = True
+    elif mode == "u":
+        intersection = False
+    else:
+        print(f"Invalid mode \"{sys.argv[1]}\", aborting.")
+        return
 
-    # # Output
-    # dfa1.print_transition_table()
-    # dfa2.print_transition_table()
-    # dfaf.print_transition_table()
-    # save_dfa_file(sys.argv[3], dfaf, unreachable_states)
-    # print("Unreachable states: ", unreachable_states)
-    # dfa1.visualize_dfa("DFA-1")
-    # dfa2.visualize_dfa("DFA-2")
-    # dfaf.visualize_dfa("DFA-Final")
+    # Read input files
+    try:
+        dfa1 = read_dfa_file(sys.argv[2])
+        dfa2 = read_dfa_file(sys.argv[3])
+    except Exception as err:
+        print(f"Error: {err}")
+        return
 
+    dfaf, unreachable_states = product_construction(dfa1, dfa2, is_intersection=intersection)
 
-        # Example 1:
-    dfa_1 = read_dfa_file("./tests/example3-dfa1.txt")
-    dfa_2 = read_dfa_file("./tests/example3-dfa2.txt")
-    dfa_u = product_construction(dfa_1, dfa_2, is_intersection=False)
-    dfa_i = product_construction(dfa_1, dfa_2, is_intersection=True)
+    # Output
+    print("DFA 1:")
+    dfa1.print_transition_table()
+    print("DFA 2:")
+    dfa2.print_transition_table()
+    print("Resulting DFA:")
+    dfaf.print_transition_table()
+    save_dfa_file(sys.argv[4], dfaf, unreachable_states)
+    print("Unreachable states: ", unreachable_states)
+    dfa1.visualize_dfa("DFA-1")
+    dfa2.visualize_dfa("DFA-2")
+    dfaf.visualize_dfa("DFA-Final")
+
+    # Example 1:
+    # dfa_1 = read_dfa_file("./tests/example3-dfa1.txt")
+    # dfa_2 = read_dfa_file("./tests/example3-dfa2.txt")
+    # dfa_u = product_construction(dfa_1, dfa_2, is_intersection=False)
+    # dfa_i = product_construction(dfa_1, dfa_2, is_intersection=True)
     
-    test_strings =["10011", "10010"]
+    # test_strings =["10011", "10010"]
 
-    for string in test_strings:
-        print()
-        print(f"Does DFA 1 accept {string}?: {dfa_1.accepts_string(string)}")
-        print(f"Does DFA 2 accept {string}?: {dfa_2.accepts_string(string)}")
-        print(f"Does the union of the DFAs accept {string}?: {dfa_u[0].accepts_string(string)}")
-        print(f"Does the intersection of the DFA accept {string}?: {dfa_i[0].accepts_string(string)}")
-        print()
+    # for string in test_strings:
+    #     print()
+    #     print(f"Does DFA 1 accept {string}?: {dfa_1.accepts_string(string)}")
+    #     print(f"Does DFA 2 accept {string}?: {dfa_2.accepts_string(string)}")
+    #     print(f"Does the union of the DFAs accept {string}?: {dfa_u[0].accepts_string(string)}")
+    #     print(f"Does the intersection of the DFA accept {string}?: {dfa_i[0].accepts_string(string)}")
+    #     print()
 
 
     # dfa_1.visualize_dfa("DFA 1")

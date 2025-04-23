@@ -30,7 +30,7 @@ To run ProdCon, you must have two input DFA text files, representing the two DFA
 
 Please run ProdCon using the following command:
 ```
-python prodcon.py <path of input DFA file #1> <path of input DFA file #2> <path of output DFA file>
+python prodcon.py <"i" for intersection | "u" for union> <path of input DFA file #1> <path of input DFA file #2> <path of output DFA file>
 ```
 
 Argument indices are assumed to be including ``prodcon.py``; if you run the program via ``./prodcon.py ...`` instead of ``python prodcon.py ...``, you will not get the desired outcome.
