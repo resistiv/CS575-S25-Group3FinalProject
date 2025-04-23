@@ -160,8 +160,13 @@ def read_dfa_file(filename: str) -> DFA:
         start_state = file.readline().strip()
         if not start_state:
             raise Exception("No start state is defined for the DFA.")
+        if start_state not in states:
+            raise Exception(f"Attempted to define start state which does not exist in the DFA: {start_state}")
         # Accepting state(s) as comma-separated line: "q2,q3"
         accepting_states = list(filter(None, file.readline().strip().split(",")))
+        for acc_state in accepting_states:
+            if acc_state not in states:
+                raise Exception(f"Attempted to define accepting state which does not exist in the DFA: {acc_state}")
             
     return DFA(states, alphabet, transitions, start_state, accepting_states)
 
