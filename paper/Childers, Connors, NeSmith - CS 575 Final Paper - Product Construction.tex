@@ -152,7 +152,8 @@ When computing the product of these two DFA's, the resulting transition table is
     \label{table-exp1-dfaprod}
 \end{table}
 
-With the algorithmically determined unreachable states being $a_0,b_1$ and $a_r,b_0$.\\ (DETAIL WHY THESE ARE UNREACHABLE HERE)
+The algorithmically determined unreachable states are \( (a_0, b_1) \) and \( (a_r, b_0) \). When analyzing these state pairs in the context of their original DFAs, we can understand why they are unreachable in the product DFA. For the state pair \( (a_0, b_1) \), note that \( b_1 \) can only be reached from DFA 2’s start state by a transition on input 0. However, in DFA 1, \( a_0 \) transitions to a different state on input 0 and does not allow any transitions that lead back to \( a_0 \). Therefore, there is no string that leads to the simultaneous presence of \( a_0 \) and \( b_1 \), rendering this state pair unreachable in the product. A similar rationale applies to \( (a_r, b_0) \). The state \( a_r \) in DFA 1 is reached via a transition on input 0, while \( b_0 \) in DFA 2 transitions away from itself on input 0 and does not return. Thus, there is no string in the input alphabet that can result in the system being in the state \( (a_r, b_0) \), making it unreachable as well. \\
+
 
 In order to verify the intersection and union properties, we use the \texttt{accepts\_string} method to test string acceptance in the product DFA. The results demonstrate the logical operations between the original DFAs:
 
