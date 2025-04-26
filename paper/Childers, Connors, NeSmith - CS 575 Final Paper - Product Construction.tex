@@ -57,7 +57,7 @@ ABSTRACT HERE - ALL
 \end{abstract}
 
 \section{Introduction}
-In automata theory, product construction describes the method by which two deterministic finite automata (DFAs) are combined into a single DFA to accept a language that is derived from a certain boolean operation on the languages of the original DFA's such as intersection and union. This method plays a pivotal role in many applications in computing theory and formal language processing. In particular, product construction provides a means for which relationships between regular languages can be explored. By constructing a product DFA, one can effectively evaluate whether two DFAs accept overlapping inputs, meet certain logical requirements, or satisfy a desired system behavior.
+In automata theory, product construction describes the method by which two deterministic finite automata (DFAs) are combined into a single DFA to accept a language that is derived from a certain boolean operation on the languages of the original DFAs such as intersection and union. This method plays a pivotal role in many applications in computing theory and formal language processing. In particular, product construction provides a means for which relationships between regular languages can be explored. By constructing a product DFA, one can effectively evaluate whether two DFAs accept overlapping inputs, meet certain logical requirements, or satisfy a desired system behavior.
 
 \section{Problem Statement}
 While the process of DFA product construction is a well understood concept in automata theory, the manual computation of a product DFA can become extremely complex and error-prone as the size of the DFAs involved increase. Additionally, the intricacy of these product DFAs can often complicate the process of verifying logical operations like the intersection and union of different automata. This sparks the need for a programmatic solution capable of systematically identifying the product states and transitions, simulating the traversal of a DFA given an input string and presenting the resulting automaton in a clear and interpretable form. This work addresses the lack of available resources regarding this issue by detailing the implementation and formal proof for product construction in Python, along with its potential use cases in verifying logical expressions.
@@ -66,7 +66,7 @@ While the process of DFA product construction is a well understood concept in au
 \textbf{IMPLEMENTATION DETAILS HERE - AUGIE}
 
 \section{Experiments}
-In this section, we will explore how product construction can be applied to a variety of different DFA's with a focus on the differences between intersection and union as well as identifying the causes of unreachable states in the resulting automaton
+In this section, we will explore how product construction can be applied to a variety of different DFAs with a focus on the differences between intersection and union as well as identifying the causes of unreachable states in the resulting automaton
 
 \subsection{Experiment 1}
 In this experiment, we started with two DFAs to product construct in order to test the basic capabilities of our implementation. The first DFA, whose transition table is shown in Table \ref{table-exp1-dfa1} and diagram shown in Fig. \ref{fig-exp1-dfa1}, accepts the language that contains strings of length at least two that have a 1 in their second position.
@@ -131,7 +131,7 @@ The second DFA, whose transition table is shown in Table \ref{table-exp1-dfa2} a
     \label{fig-exp1-dfa2}
 \end{figure}
 
-When computing the product of these two DFA's, the resulting transition table is shown in Table \ref{table-exp1-dfaprod} and diagram shown in Fig. \ref{fig-exp1-dfaprod}.
+When computing the product of these two DFAs, the resulting transition table is shown in Table \ref{table-exp1-dfaprod} and diagram shown in Fig. \ref{fig-exp1-dfaprod}.
 
 \begin{table}[h!]
     \caption{Experiment 1's Product DFA Transition Table}
@@ -270,7 +270,7 @@ The second DFA, whose transition table is shown in Table \ref{table-exp2-dfa2} a
     \label{fig-exp2-dfa2}
 \end{figure}
 
-When computing the product of these two DFA's, the resulting transition table is shown in Table \ref{table-exp2-dfaprod} and diagram shown in Fig. \ref{fig-exp2-dfaprod}.
+When computing the product of these two DFAs, the resulting transition table is shown in Table \ref{table-exp2-dfaprod} and diagram shown in Fig. \ref{fig-exp2-dfaprod}.
 
 Notably, this experiment differs from Experiment 1 in that it generates no unreachable states, due to the behavior of the two separate DFAs. Since there are only transitions to different states on a 0 input in DFA 1, and only transitions to different states on a 1 input in DFA 2, the resulting product constructed DFA exhibits a lattice-like structure, while ensuring that no resultant states are unreachable (this essentially functions like a coordinate grid, meaning that you can reach any resultant state from the start state on an appropriate input since no transitions in the original DFAs preempt another transition).
 
@@ -356,7 +356,241 @@ Intersection DFA & False & False & False & True \\ \hline
 \end{tabular}
 \end{table} 
 
-\textbf{EXPERIMENTS HERE - EVAN \& KAI}
+\subsection{Experiment 3}
+In this experiment, we started with two DFAs to product construct in order to test and verbosely demonstrate the difference between union and intersection product constructions. As discussed in the Implementation Details section, the only difference between union and intersection operations when performing product construction is the way the accepting states set is constructed. By creating a test to demonstrate this prominently, we would be able to effectively evaluate whether our process successfully constructed the accepting states set. The first DFA, whose transition table is shown in Table \ref{table-exp3-dfa1} and diagram shown in Fig. \ref{fig-exp3-dfa1}, accepts all strings (it is purposefully very simple).
+
+\begin{table}[h!]
+    \caption{Experiment 3's DFA 1 Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow * q_0 & q_0 & q_0 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp3-dfa1}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial, accepting] (q0) {$q_{0}$};
+    
+        \draw (q0) edge[loop above] node{$0,1$} (q0);
+    \end{tikzpicture}
+    \caption{Experiment 3's DFA 1}
+    \label{fig-exp3-dfa1}
+\end{figure}
+
+The second DFA, whose transition table is shown in Table \ref{table-exp3-dfa2} and diagram shown in Fig. \ref{fig-exp3-dfa2}, was designed simply for its complexity; we did not consider the language it accepts, as it is only meant to be dense.
+
+\begin{table}[h!]
+    \caption{Experiment 3's DFA 2 Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow a_0 & a_7 & a_9 \\
+        a_1 & a_5 & a_4 \\
+        a_2 & a_8 & a_2 \\
+        a_3 & a_5 & a_6 \\
+        a_4 & a_6 & a_5 \\
+        a_5 & a_{10} & a_7 \\
+        * a_6 & a_8 & a_3 \\
+        a_7 & a_2 & a_7 \\
+        * a_8 & a_0 & a_{10} \\
+        a_9 & a_4 & a_1 \\
+        a_{10} & a_{10} & a_2 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp3-dfa2}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] (a0) {$a_{0}$};
+        \node[state, below of=a0] (a7) {$a_{7}$};
+        \node[state, right of=a7] (a9) {$a_{9}$};
+        \node[state, below of=a9] (a1) {$a_{1}$};
+        \node[state, below of=a1] (a4) {$a_{4}$};
+        \node[state, below of=a7] (a5) {$a_{5}$};
+        \node[state, left of=a5] (a2) {$a_{2}$};
+        \node[state, accepting, below of=a2] (a8) {$a_{8}$};
+        \node[state, below of=a8] (a10) {$a_{10}$};
+        \node[state, accepting, below of=a4] (a6) {$a_{6}$};
+        \node[state, below of=a5] (a3) {$a_{3}$};
+    
+        \draw (a0) edge[left] node{$0$} (a7)
+                   edge[bend left, above] node{$1$} (a9)
+              (a1) edge[above] node{$0$} (a5)
+                   edge[left] node{$1$} (a4)
+              (a2) edge[right] node{$0$} (a8)
+                   edge[loop above] node{$1$} (a2)
+              (a3) edge[right] node{$0$} (a5)
+                   edge[bend left, below] node{$1$} (a6)
+              (a4) edge[right] node{$0$} (a6)
+                   edge[above] node{$1$} (a5)
+              (a5) edge[right] node{$0$} (a10)
+                   edge[left] node{$1$} (a7)
+              (a6) edge[bend left, below] node{$0$} (a8)
+                   edge[bend left, above] node{$1$} (a3)
+              (a7) edge[above] node{$0$} (a2)
+                   edge[loop left] node{$1$} (a7)
+              (a8) edge[bend left=45, left] node{$0$} (a0)
+                   edge[left] node{$1$} (a10)
+              (a9) edge[bend left, right] node{$0$} (a4)
+                   edge[left] node{$1$} (a1)
+              (a10) edge[loop left] node{$0$} (a10)
+                   edge[bend left=35, left] node{$1$} (a2);
+    \end{tikzpicture}
+    \caption{Experiment 3's DFA 2}
+    \label{fig-exp3-dfa2}
+\end{figure}
+
+When computing the product of these two DFAs using the intersection method (which has been used in the preceding experiments), the resulting transition table is shown in Table \ref{table-exp3-dfaprodi} and diagram shown in Fig. \ref{fig-exp3-dfaprodi}. Note that the transition table and diagram are essentially the same as the original DFA 2. Since DFA 1 is only one state, no "new" states are generated as a result of taking the Cartesian product of the two sets of states (all of DFA 2's states are preserved, just with $q_0$ prepended). Additionally, since we chose to use the intersection method, only state pairs that are both accepting are marked as accepting in the resulting DFA, meaning that DFA 2's original accepting states are also preserved. Therefore, the intersection product DFA is functionally the same as DFA 2.
+
+\begin{table}[h!]
+    \caption{Experiment 3's Intersection Product DFA Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow q_0,a_0 & q_0,a_7 & q_0,a_9 \\
+        q_0,a_1 & q_0,a_5 & q_0,a_4 \\
+        q_0,a_2 & q_0,a_8 & q_0,a_2 \\
+        q_0,a_3 & q_0,a_5 & q_0,a_6 \\
+        q_0,a_4 & q_0,a_6 & q_0,a_5 \\
+        q_0,a_5 & q_0,a_{10} & q_0,a_7 \\
+        * q_0,a_6 & q_0,a_8 & q_0,a_3 \\
+        q_0,a_7 & q_0,a_2 & q_0,a_7 \\
+        * q_0,a_8 & q_0,a_0 & q_0,a_{10} \\
+        q_0,a_9 & q_0,a_4 & q_0,a_1 \\
+        q_0,a_{10} & q_0,a_{10} & q_0,a_2 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp3-dfaprodi}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] (a0) {$q_0,a_{0}$};
+        \node[state, below of=a0] (a7) {$q_0,a_{7}$};
+        \node[state, right of=a7] (a9) {$q_0,a_{9}$};
+        \node[state, below of=a9] (a1) {$q_0,a_{1}$};
+        \node[state, below of=a1] (a4) {$q_0,a_{4}$};
+        \node[state, below of=a7] (a5) {$q_0,a_{5}$};
+        \node[state, left of=a5] (a2) {$q_0,a_{2}$};
+        \node[state, accepting, below of=a2] (a8) {$q_0,a_{8}$};
+        \node[state, below of=a8] (a10) {$q_0,a_{10}$};
+        \node[state, accepting, below of=a4] (a6) {$q_0,a_{6}$};
+        \node[state, below of=a5] (a3) {$q_0,a_{3}$};
+    
+        \draw (a0) edge[left] node{$0$} (a7)
+                   edge[bend left, above] node{$1$} (a9)
+              (a1) edge[above] node{$0$} (a5)
+                   edge[left] node{$1$} (a4)
+              (a2) edge[right] node{$0$} (a8)
+                   edge[loop above] node{$1$} (a2)
+              (a3) edge[right] node{$0$} (a5)
+                   edge[bend left, below] node{$1$} (a6)
+              (a4) edge[right] node{$0$} (a6)
+                   edge[above] node{$1$} (a5)
+              (a5) edge[left] node{$0$} (a10)
+                   edge[left] node{$1$} (a7)
+              (a6) edge[bend left, below] node{$0$} (a8)
+                   edge[bend left, above] node{$1$} (a3)
+              (a7) edge[above] node{$0$} (a2)
+                   edge[loop left] node{$1$} (a7)
+              (a8) edge[bend left=45, left] node{$0$} (a0)
+                   edge[left] node{$1$} (a10)
+              (a9) edge[bend left, right] node{$0$} (a4)
+                   edge[left] node{$1$} (a1)
+              (a10) edge[loop left] node{$0$} (a10)
+                   edge[bend left=35, left] node{$1$} (a2);
+    \end{tikzpicture}
+    \caption{Experiment 3's Intersection Product DFA}
+    \label{fig-exp3-dfaprodi}
+\end{figure}
+
+On the other hand, when computing the product of these two DFAs using the union, the resulting transition table is shown in Table \ref{table-exp3-dfaprodu} and diagram shown in Fig. \ref{fig-exp3-dfaprodu}. Note that once again, as in the intersection case, the states and transitions of DFA 2 are preserved and prepended with $q_0$, but now all states are marked as accepting. This is due to the behavior of DFA 1; since all states in the product DFA contain at least one original accepting state, all states accept via union logic.
+
+\begin{table}[h!]
+    \caption{Experiment 3's Union Product DFA Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow * q_0,a_0 & q_0,a_7 & q_0,a_9 \\
+        * q_0,a_1 & q_0,a_5 & q_0,a_4 \\
+        * q_0,a_2 & q_0,a_8 & q_0,a_2 \\
+        * q_0,a_3 & q_0,a_5 & q_0,a_6 \\
+        * q_0,a_4 & q_0,a_6 & q_0,a_5 \\
+        * q_0,a_5 & q_0,a_{10} & q_0,a_7 \\
+        * q_0,a_6 & q_0,a_8 & q_0,a_3 \\
+        * q_0,a_7 & q_0,a_2 & q_0,a_7 \\
+        * q_0,a_8 & q_0,a_0 & q_0,a_{10} \\
+        * q_0,a_9 & q_0,a_4 & q_0,a_1 \\
+        * q_0,a_{10} & q_0,a_{10} & q_0,a_2 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp3-dfaprodu}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, accepting, initial] (a0) {$q_0,a_{0}$};
+        \node[state, accepting, below of=a0] (a7) {$q_0,a_{7}$};
+        \node[state, accepting, right of=a7] (a9) {$q_0,a_{9}$};
+        \node[state, accepting, below of=a9] (a1) {$q_0,a_{1}$};
+        \node[state, accepting, below of=a1] (a4) {$q_0,a_{4}$};
+        \node[state, accepting, below of=a7] (a5) {$q_0,a_{5}$};
+        \node[state, accepting, left of=a5] (a2) {$q_0,a_{2}$};
+        \node[state, accepting, below of=a2] (a8) {$q_0,a_{8}$};
+        \node[state, accepting, below of=a8] (a10) {$q_0,a_{10}$};
+        \node[state, accepting, below of=a4] (a6) {$q_0,a_{6}$};
+        \node[state, accepting, below of=a5] (a3) {$q_0,a_{3}$};
+    
+        \draw (a0) edge[left] node{$0$} (a7)
+                   edge[bend left, above] node{$1$} (a9)
+              (a1) edge[above] node{$0$} (a5)
+                   edge[left] node{$1$} (a4)
+              (a2) edge[right] node{$0$} (a8)
+                   edge[loop above] node{$1$} (a2)
+              (a3) edge[right] node{$0$} (a5)
+                   edge[bend left, below] node{$1$} (a6)
+              (a4) edge[right] node{$0$} (a6)
+                   edge[above] node{$1$} (a5)
+              (a5) edge[left] node{$0$} (a10)
+                   edge[left] node{$1$} (a7)
+              (a6) edge[bend left, below] node{$0$} (a8)
+                   edge[bend left, above] node{$1$} (a3)
+              (a7) edge[above] node{$0$} (a2)
+                   edge[loop left] node{$1$} (a7)
+              (a8) edge[bend left=45, left] node{$0$} (a0)
+                   edge[left] node{$1$} (a10)
+              (a9) edge[bend left, right] node{$0$} (a4)
+                   edge[left] node{$1$} (a1)
+              (a10) edge[loop left] node{$0$} (a10)
+                   edge[bend left=35, left] node{$1$} (a2);
+    \end{tikzpicture}
+    \caption{Experiment 3's Union Product DFA}
+    \label{fig-exp3-dfaprodu}
+\end{figure}
+
+The preceding results can be further verified by picking strings that are accepted and using the \texttt{accepts\_string} method to test them using the two product DFAs. The results, seen in Table \ref{table-exp3-dfabool}, demonstrate the logical operations between the original DFAs. Of important note, the table is truncated, as there is no case in which DFA 1 will not accept, so such cases were removed from the table. As can be seen in both the diagrams and from reasoning about the two original DFAs, the union and intersection results are as expected, thereby demonstrating the difference between union and intersection while also verifying an edge case of a singular state.
+
+\begin{table}[h!]
+\centering
+\caption{Boolean Analysis of Experiment 3's Product DFA Operations}
+\label{table-exp3-dfabool}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{DFA Type} & \textbf{10010} & \textbf{10011} \\ \hline
+DFA 1 & True & True \\ \hline
+DFA 2 & False & True \\ \hline
+Union DFA & True & True \\ \hline
+Intersection DFA & False & True \\ \hline
+\end{tabular}
+\end{table} 
 
 \section{Contributions}
 \subsection{Evan Childers}
@@ -364,10 +598,12 @@ Intersection DFA & False & False & False & True \\ \hline
 \subsection{August Connors}
 \textbf{AUGIE CONTRIBUTIONS HERE}
 \subsection{Kai NeSmith}
-\textbf{KAI CONTRIBUTIONS HERE}
+In terms of implementation, Kai created the underlying data structure for handling DFAs in Python, alongside providing the design and saving method for the text file format to read and write DFA data to. They also created and maintained the README file of the repository, improved the main method of the code to allow for command line input, and implemented a GitHub Action that would validate and build the PDF version of this paper in order to validate simultaneous edits.
+
+Outside of code, Kai worked with Evan to test the program by creating experiments and documenting them. In the case of the paper, they formatted the code output into \LaTeX-compatible tables and automaton diagrams in order to deliver a polished final product, while providing the majority of content for Experiments 2 \& 3. They also assisted in writing the conclusion and abstract of the paper.
 
 \section{Conclusion}
-\textbf{CONCLUSION HER - KAI (ALL)}
+\textbf{CONCLUSION HERE - KAI (ALL)}
 
 % Not sure if we'll need a bibliography, so leaving the template here in case.
 \begin{thebibliography}{00}
