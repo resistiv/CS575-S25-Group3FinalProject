@@ -131,7 +131,7 @@ The second DFA, whose transition table is shown in Table \ref{table-exp1-dfa2} a
     \label{fig-exp1-dfa2}
 \end{figure}
 
-When computing the product of these two DFA's, the resulting transition table is:
+When computing the product of these two DFA's, the resulting transition table is shown in Table \ref{table-exp1-dfaprod} and diagram shown in Fig. \ref{fig-exp1-dfaprod}.
 
 \begin{table}[h!]
     \caption{Experiment 1's Product DFA Transition Table}
@@ -151,16 +151,44 @@ When computing the product of these two DFA's, the resulting transition table is
     \end{displaymath}
     \label{table-exp1-dfaprod}
 \end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] at (0,-2) (a0b0) {$a_0,b_0$};
+        \node[state] (a0b1) at (0,0) {$a_0,b_1$};
+        \node[state] (a1b0) at (2.5,-4) {$a_1,b_0$};
+        \node[state] (a1b1) at (2.5,0) {$a_1,b_1$};
+        \node[state] (a2b0) at (6.5,-4) {$a_2,b_0$};
+        \node[state, accepting] at (6.5,0) (a2b1) {$a_2,b_1$};
+        \node[state] (arb0) at (2.5,-2) {$a_r,b_0$};
+        \node[state] (arb1) at (5,-2) {$a_r,b_1$};
 
-The algorithmically determined unreachable states are \( (a_0, b_1) \) and \( (a_r, b_0) \). When analyzing these state pairs in the context of their original DFAs, we can understand why they are unreachable in the product DFA. For the state pair \( (a_0, b_1) \), note that \( b_1 \) can only be reached from DFA 2’s start state by a transition on input 0. However, in DFA 1, \( a_0 \) transitions to a different state on input 0 and does not allow any transitions that lead back to \( a_0 \). Therefore, there is no string that leads to the simultaneous presence of \( a_0 \) and \( b_1 \), rendering this state pair unreachable in the product. A similar rationale applies to \( (a_r, b_0) \). The state \( a_r \) in DFA 1 is reached via a transition on input 0, while \( b_0 \) in DFA 2 transitions away from itself on input 0 and does not return. Thus, there is no string in the input alphabet that can result in the system being in the state \( (a_r, b_0) \), making it unreachable as well. \\
+        \draw (a0b0) edge[above] node{$0$} (a1b1)
+                     edge[below] node{$1$} (a1b0)
+              (a0b1) edge[above] node{$0,1$} (a1b1)
+              (a1b0) edge[below] node{$0$} (arb1)
+                     edge[below] node{$1$} (a2b0)
+              (a1b1) edge[above] node{$0$} (arb1)
+                     edge[above] node{$1$} (a2b1)
+              (a2b0) edge[right] node{$0$} (a2b1)
+                     edge[loop below] node{$1$} (a2b0)
+              (a2b1) edge[loop above] node{$0,1$} (a2b1)
+              (arb0) edge[loop left]  node{$1$} (arb0)
+                     edge[above] node {$0$} (arb1)
+              (arb1) edge[loop above] node{$0,1$} (arb1);
+    \end{tikzpicture}
+    \caption{Experiment 1's Product DFA}
+    \label{fig-exp1-dfaprod}
+\end{figure}
 
+The algorithmically determined unreachable states are \( (a_0, b_1) \) and \( (a_r, b_0) \). When analyzing these state pairs in the context of their original DFAs, we can understand why they are unreachable in the product DFA. For the state pair \( (a_0, b_1) \), note that \( b_1 \) can only be reached from DFA 2's start state by a transition on input 0. However, in DFA 1, \( a_0 \) transitions to a different state on input 0 and does not allow any transitions that lead back to \( a_0 \). Therefore, there is no string that leads to the simultaneous presence of \( a_0 \) and \( b_1 \), rendering this state pair unreachable in the product. A similar rationale applies to \( (a_r, b_0) \). The state \( a_r \) in DFA 1 is reached via a transition on input 0, while \( b_0 \) in DFA 2 transitions away from itself on input 0 and does not return. Thus, there is no string in the input alphabet that can result in the system being in the state \( (a_r, b_0) \), making it unreachable as well.
 
-In order to verify the intersection and union properties, we use the \texttt{accepts\_string} method to test string acceptance in the product DFA. The results demonstrate the logical operations between the original DFAs:
+In order to verify the intersection and union properties, we use the \texttt{accepts\_string} method to test string acceptance in the product DFA. The results, seen in Table \ref{table-exp1-dfabool}, demonstrate the logical operations between the original DFAs.
 
 \begin{table}[h!]
 \centering
-\caption{Boolean Analysis of Product DFA Operations}
-\label{table-dfa_boolean}
+\caption{Boolean Analysis of Experiment 1's Product DFA Operations}
+\label{table-exp1-dfabool}
 \begin{tabular}{|c|c|c|c|c|}
 \hline
 \textbf{DFA Type} & \textbf{11} & \textbf{00} & \textbf{01} & \textbf{1} \\ \hline
@@ -173,9 +201,160 @@ Intersection DFA & False & False & True & False \\ \hline
 
 As shown in table, the union DFA accepts a string if either original DFA accepts it ($\text{DFA}_1 \cup \text{DFA}_2$), while the intersection DFA only accepts strings accepted by both ($\text{DFA}_1 \cap \text{DFA}_2$). The results confirm the correct implementation of these Boolean operations.
 
-
 \subsection{Experiment 2}
+In this experiment, we started with a pair of slightly larger DFAs in order to further test the capabilities of our product construction implementation. The first DFA, whose transition table is shown in Table \ref{table-exp2-dfa1} and diagram shown in Fig. \ref{fig-exp2-dfa1}, accepts the language that contains strings that have exactly two 0s.
 
+\begin{table}[h!]
+    \caption{Experiment 2's DFA 1 Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow a_0 & a_1 & a_0 \\
+        a_1 & a_2 & a_1 \\
+        * a_2 & a_3 & a_2 \\
+        a_3 & a_3 & a_3 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp2-dfa1}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] (a0) {$a_{0}$};
+        \node[state, right of=a0] (a1) {$a_{1}$};
+        \node[state, right of=a1, accepting] (a2) {$a_{2}$};
+        \node[state, right of=a2] (a3) {$a_{3}$};
+    
+        \draw (a0) edge[above] node{$0$} (a1)
+                   edge[loop above] node{$1$} (a0)
+              (a1) edge[above] node{$0$} (a2)
+                   edge[loop above] node{$1$} (a1)
+              (a2) edge[above] node{$0$} (a3)
+                   edge[loop above] node{$1$} (a2)
+              (a3) edge[loop above] node{$0,1$} (a3);
+    \end{tikzpicture}
+    \caption{Experiment 2's DFA 1}
+    \label{fig-exp2-dfa1}
+\end{figure}
+
+The second DFA, whose transition table is shown in Table \ref{table-exp2-dfa2} and diagram shown in Fig. \ref{fig-exp2-dfa2}, accepts the language that contains strings that contains at least two 1s.
+
+\begin{table}[h!]
+    \caption{Experiment 2's DFA 2 Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow b_0 & b_0 & b_1 \\
+        b_1 & b_1 & b_2 \\
+        * b_2 & b_2 & b_2 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp2-dfa2}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] (b0) {$b_{0}$};
+        \node[state, right of=b0] (b1) {$b_{1}$};
+        \node[state, right of=b1, accepting] (b2) {$b_{2}$};
+    
+        \draw (b0) edge[above] node{$1$} (b1)
+                   edge[loop above] node{$0$} (b0)
+              (b1) edge[above] node{$1$} (b2)
+                   edge[loop above] node{$0$} (b1)
+              (b2) edge[loop above] node{$0,1$} (a2);
+    \end{tikzpicture}
+    \caption{Experiment 2's DFA 2}
+    \label{fig-exp2-dfa2}
+\end{figure}
+
+When computing the product of these two DFA's, the resulting transition table is shown in Table \ref{table-exp2-dfaprod} and diagram shown in Fig. \ref{fig-exp2-dfaprod}.
+
+Notably, this experiment differs from Experiment 1 in that it generates no unreachable states, due to the behavior of the two separate DFAs. Since there are only transitions to different states on a 0 input in DFA 1, and only transitions to different states on a 1 input in DFA 2, the resulting product constructed DFA exhibits a lattice-like structure, while ensuring that no resultant states are unreachable (this essentially functions like a coordinate grid, meaning that you can reach any resultant state from the start state on an appropriate input since no transitions in the original DFAs preempt another transition).
+
+\begin{table}[h!]
+    \caption{Experiment 2's Product DFA Transition Table}
+    \begin{displaymath}
+        \begin{array}{r|c|c|}
+        & 0 & 1 \\
+        \hline
+        \rightarrow a_0,b_0 & a_1,b_0 & a_0,b_1 \\
+        a_0,b_1 & a_1,b_1 & a_0,b_2 \\
+        a_0,b_2 & a_1,b_2 & a_0,b_2 \\
+        a_1,b_0 & a_2,b_0 & a_1,b_1 \\
+        a_1,b_1 & a_2,b_1 & a_1,b_2 \\
+        a_1,b_2 & a_2,b_2 & a_1,b_2 \\
+        a_2,b_0 & a_3,b_0 & a_2,b_1 \\
+        a_2,b_1 & a_3,b_1 & a_2,b_2 \\
+        * a_2,b_2 & a_3,b_2 & a_2,b_2 \\
+        a_3,b_0 & a_3,b_0 & a_3,b_1 \\
+        a_3,b_1 & a_3,b_1 & a_3,b_2 \\
+        a_3,b_2 & a_3,b_2 & a_3,b_2 \\
+        \end{array}
+    \end{displaymath}
+    \label{table-exp2-dfaprod}
+\end{table}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
+        \node[state, initial] at (0,0) (a0b0) {$a_0,b_0$};
+        \node[state] (a0b1) at (0,-1.8) {$a_0,b_1$};
+        \node[state] (a0b2) at (0,-3.6) {$a_0,b_2$};
+        \node[state] (a1b0) at (1.8,0)  {$a_1,b_0$};
+        \node[state] (a1b1) at (1.8,-1.8) {$a_1,b_1$};
+        \node[state] (a1b2) at (1.8,-3.6) {$a_1,b_2$};
+        \node[state] (a2b0) at (3.6,0)  {$a_2,b_0$};
+        \node[state] (a2b1) at (3.6,-1.8) {$a_2,b_1$};
+        \node[state, accepting] (a2b2) at (3.6,-3.6) {$a_2,b_2$};
+        \node[state] (a3b0) at (5.4,0)  {$a_3,b_0$};
+        \node[state] (a3b1) at (5.4,-1.8) {$a_3,b_1$};
+        \node[state] (a3b2) at (5.4,-3.6) {$a_3,b_2$};
+
+        \draw (a0b0) edge[above] node{$0$} (a1b0)
+                     edge[right] node{$1$} (a0b1)
+              (a0b1) edge[above] node{$0$} (a1b1)
+                     edge[right] node{$1$} (a0b2)
+              (a0b2) edge[above] node{$0$} (a1b2)
+                     edge[loop below] node{$1$} (a0b2)
+              (a1b0) edge[above] node{$0$} (a2b0)
+                     edge[right] node{$1$} (a1b1)
+              (a1b1) edge[above] node{$0$} (a2b1)
+                     edge[right] node{$1$} (a1b2)
+              (a1b2) edge[above] node{$0$} (a2b2)
+                     edge[loop below] node{$1$} (a1b2)
+              (a2b0) edge[above] node{$0$} (a3b0)
+                     edge[right] node{$1$} (a2b1)
+              (a2b1) edge[above] node{$0$} (a3b1)
+                     edge[right] node{$1$} (a2b2)
+              (a2b2) edge[above] node{$0$} (a3b2)
+                     edge[loop below] node{$1$} (a2b2)
+              (a3b0) edge[loop right] node{$0$} (a3b0)
+                     edge[right] node{$1$} (a3b1)
+              (a3b1) edge[loop right] node{$0$} (a3b1)
+                     edge[right] node{$1$} (a3b2)
+              (a3b2) edge[loop below] node{$0,1$} (a3b2);
+    \end{tikzpicture}
+    \caption{Experiment 2's Product DFA}
+    \label{fig-exp2-dfaprod}
+\end{figure}
+
+In order to verify the intersection and union properties, we use the \texttt{accepts\_string} method to test string acceptance in the product DFA. The results, seen in Table \ref{table-exp2-dfabool}, demonstrate the logical operations between the original DFAs. As was the case in Experiment 1, the union and intersection DFAs act as expected for the respective operations, thereby supporting our confidence in the implementation.
+
+\begin{table}[h!]
+\centering
+\caption{Boolean Analysis of Experiment 2's Product DFA Operations}
+\label{table-exp2-dfabool}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{DFA Type} & \textbf{000} & \textbf{00} & \textbf{11} & \textbf{0101} \\ \hline
+DFA 1 & False & True & False & True \\ \hline
+DFA 2 & False & False & True & True \\ \hline
+Union DFA & False & True & True & True \\ \hline
+Intersection DFA & False & False & False & True \\ \hline
+\end{tabular}
+\end{table} 
 
 \textbf{EXPERIMENTS HERE - EVAN \& KAI}
 
@@ -192,7 +371,7 @@ As shown in table, the union DFA accepts a string if either original DFA accepts
 
 % Not sure if we'll need a bibliography, so leaving the template here in case.
 \begin{thebibliography}{00}
-\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
+\bibitem{b1} M. Sipser, \textit{Introduction to the Theory of Computation}. Cengage Learning, 2012.
 \end{thebibliography}
 
 \end{document}
