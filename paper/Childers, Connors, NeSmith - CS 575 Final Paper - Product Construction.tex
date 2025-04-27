@@ -64,7 +64,48 @@ In automata theory, product construction describes the method by which two deter
 While the process of DFA product construction is a well understood concept in automata theory, the manual computation of a product DFA can become extremely complex and error-prone as the size of the DFAs involved increase. Additionally, the intricacy of these product DFAs can often complicate the process of verifying logical operations like the intersection and union of different automata. This sparks the need for a programmatic solution capable of systematically identifying the product states and transitions, simulating the traversal of a DFA given an input string and presenting the resulting automaton in a clear and interpretable form. This work addresses the lack of available resources regarding this issue by detailing the implementation and formal proof for product construction in Python, along with its potential use cases in verifying logical expressions.
 
 \section{Implementation}
-\textbf{IMPLEMENTATION DETAILS HERE - AUGIE}
+The implementation of the product construction for two deterministic finite automata (DFAs) was developed in Python, utilizing a custom DFA class to encapsulate the automaton’s components and facilitate the construction process. In the scope of this paper, the case of both input DFAs sharing an alphabet was considered for simplicity. The DFA class is initialized with a constructor that accepts five parameters: a list of states, a list of alphabet symbols, a dictionary of transitions mapping state-symbol pairs to destination states, an initial state, and a list of accepting states. This structured representation ensures efficient access to DFA components, simplifying the product construction and state reachability analysis. For the discussion of the product algorithm, the input DFAs will be represented by the tuples
+\[ D_1 = (Q_1, \Sigma_1, \delta_1, s_1, F_1) \]
+\[ D_2 = (Q_2, \Sigma_2, \delta_2, s_2, F_2) \]
+and the product DFA represented by
+\[ D' = (Q', \Sigma', \delta', s', F') \]
+where $Q$ denotes the list of states, $\Sigma$ the alphabet, $\delta$ the transition function, $s$ the start state, and $F$ the list of accepting states. 
+
+The product construction function is primarily based on the formal definition, particularly adapted from Sipser's interpretation for union \cite{b1}. The function takes two DFA objects as input and generates a new DFA representing either the intersection or union of their languages. In addition to the two DFAs, the function's input includes a flag indicating whether the intersection or union is desired. The function constructs the state set of the product DFA as the Cartesian product of the input DFAs’ state lists, forming pairs $(q_1, q_2)$ where $q_1 \in Q_1, q_2 \in Q_2$. The alphabet is inherited from the input DFAs, as both share the same alphabet. The transition function is defined using the input DFAs’ transition dictionaries: for a state pair $(q_1, q_2) \in Q'$ and symbol $a$, the transition is to $(\delta_1[(q_1, a)], \delta_2[(q_2, a)])$. The initial state of the product DFA is the pair $(s_1, s_2)$. The list of accepting states is the only attribute that differs in the product DFA based on the intersection/union flag. For an intersection, the accepting states are pairs $(q_1, q_2)$ where $q_1 \in F_1$ and $q_2 \in F_2$. For a union, the accepting states are pairs $(q_1, q_2)$ where $q_1 \in F_1$ or $q_2 \in F_2$. These components are then assembled into a new DFA object, leveraging the class’s structured format. The psuedocode for this function is provided in Algorithm \ref{alg:product}.
+
+\begin{algorithm}
+\caption{Product Construction of Two DFAs}
+\label{alg:product}
+\begin{algorithmic}
+\State $\Sigma' \gets \Sigma_1$
+\State $s' \gets s_1 + "," + s_2$
+\For{$q_1 \in Q_1$}
+    \For{$q_2 \in Q_2$}
+        \State $q' \gets q_1 + "," + q_2$
+        \State $Q'.\text{append}(q')$
+        \If{intersection}
+            \If{$q_1 \in F_1$ and $q_2 \in F_2$}
+                \State $F'.\text{append}(q')$
+            \EndIf
+        \EndIf
+        \If{union}
+            \If{$q_1 \in F_1$ or $q_2 \in F_2$}
+                \State $F'.\text{append}(q')$
+            \EndIf
+        \EndIf
+        \For{$a \in \Sigma'$}
+            \State $q_t \gets \delta_1[(q_1, a)] + "," + \delta_2[(q_2, a)]$
+            \State $\delta'[(q', a)] \gets q_t$
+        \EndFor
+    \EndFor
+\EndFor
+\State \Return \text{DFA}$(Q', \Sigma', \delta', s', F')$
+\end{algorithmic}
+\end{algorithm}
+
+To identify unreachable states in the product DFA, a breadth-first search (BFS) algorithm was implemented. Starting from the initial state pair, the BFS explores reachable state pairs by iterating over the alphabet and querying the transition dictionary. A queue manages states to be visited, and a set tracks visited states to avoid cycles. If a state returned by the querying of the transition dictionary is not already in the visited states set, it is added to both this set and the queue. The BFS algorithm keeps searching until the queue is empty. At the end of the search, the BFS has compiled a list of reachable states, and any state pairs in the product DFA’s state set not visited are identified as unreachable. This list of unreachable states is output alongside the product DFA, providing insight into the automaton’s structure without modifying its state set.
+
+This implementation benefits from the DFA class’s clear organization, which streamlines the product construction and enables efficient BFS-based analysis, ensuring accurate computation of the DFA product and identification of unreachable states.
 
 \section{Experiments}
 In this section, we will explore how product construction can be applied to a variety of different DFAs with a focus on the differences between intersection and union as well as identifying the causes of unreachable states in the resulting automaton
