@@ -640,8 +640,12 @@ Intersection DFA & False & True \\ \hline
 For implementation, Evan created the \texttt{accepts\_string} and \texttt{print\_transition\_table} functions, and provided minor fixes to the data cleaning process in the \texttt{read\_dfa\_file} method. He also implemented the \texttt{visualize\_dfa} function, which applies the pre-existing \textit{Automathon} Python library. These functions were used to validate the \texttt{product\_construction} method by writing test cases for the involved DFAs in the \texttt{main} method of the code.
 
 Outside of coding, Evan wrote the Introduction and Problem Statement sections of the paper. He also collaborated with Kai to develop and format the Experiments subsection, including the tables and automaton diagrams of the experimental results. He also assisted in writing the Abstract.
+
 \subsection{August Connors}
-\textbf{AUGIE CONTRIBUTIONS HERE}
+August implemented the product construction algorithm. This involved adapting the union algorithm from the Sipser book to use both union and intersection. Further, August created the \texttt{find\_unreachable\_states} function, which utilized a BFS to find all reachable states, and then use that to derive the unreachable states list.
+
+In addition to the coding contributions, August wrote the implementation section, covering the DFA class, product construction function, the BFS, and the testing functions. Furthermore, August included a pseudocode algorithm to help portray the method of product construction used.
+
 \subsection{Kai NeSmith}
 In terms of implementation, Kai created the underlying data structure for handling DFAs in Python, alongside providing the design and saving method, \texttt{save\_dfa\_file}, for the text file format to read and write DFA data to. They also created and maintained the README file of the repository, improved the \texttt{main} method of the code to allow for command line input, and implemented a GitHub Action that would validate and build the PDF version of this paper in order to validate simultaneous edits.
 
